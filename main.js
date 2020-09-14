@@ -6,6 +6,8 @@ const $canvas = document.querySelector('canvas')
 
 // Events
 $canvas.addEventListener('mousemove', draw)
+$canvas.addEventListener('mousemove', setMouseCoords)
+$canvas.addEventListener('mousemove', draw)
 
 // State
 const state = {
@@ -51,4 +53,13 @@ function init() {
 function draw(e) {
   if(e.buttons !== 1) return;
   console.log('drawing')
+}
+
+function setMouseCoords(e) {
+  const bounds = e.target.getBoundingClientRect()
+  // Theres probably a better way to do this, will refactor later
+  state.mouseCoords = {
+    x: e.clientX - Math.floor(bounds.left),
+    y: e.clientY - Math.floor(bounds.top)
+  }
 }
