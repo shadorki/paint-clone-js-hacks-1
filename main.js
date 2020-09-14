@@ -1,15 +1,3 @@
-// DOM Elements
-const $toolBarContainer = document.querySelector('.tool-bar')
-const $colorPalette = document.querySelector('.color-palette')
-const $currentColor = document.querySelector('.current-color')
-const $canvas = document.querySelector('canvas')
-
-// Events
-$colorPalette.addEventListener('click', switchColor)
-$canvas.addEventListener('mousemove', draw)
-$canvas.addEventListener('mousedown', setMouseCoords)
-$canvas.addEventListener('mouseenter', setMouseCoords)
-
 // State
 const state = {
   selectedColor: null,
@@ -19,6 +7,19 @@ const state = {
     y: 0
   }
 }
+
+// DOM Elements
+const $toolBarContainer = document.querySelector('.tool-bar')
+const $colorPalette = document.querySelector('.color-palette')
+const $currentColor = document.querySelector('.current-color')
+const $canvas = document.querySelector('canvas')
+
+// Events
+$colorPalette.addEventListener('click', switchColor)
+$toolBarContainer.addEventListener('click', switchTool)
+$canvas.addEventListener('mousemove', pencil)
+$canvas.addEventListener('mousedown', setMouseCoords)
+$canvas.addEventListener('mouseenter', setMouseCoords)
 
 // initialization
 const ctx = $canvas.getContext('2d')
@@ -51,7 +52,7 @@ function init() {
   state.selectedTool.classList.add('selected')
 }
 
-function draw(e) {
+function pencil(e) {
   if(e.buttons !== 1) return;
   ctx.beginPath()
   ctx.strokeStyle = state.selectedColor
@@ -76,4 +77,11 @@ function switchColor(e) {
   const { color } = e.target.dataset
   state.selectedColor = color
   $currentColor.style.backgroundColor = color
+}
+
+function switchTool(e) {
+  if (!('tool' in e.target.dataset)) return;
+  state.selectedTool.classList.remove('selected')
+  state.selectedTool = e.target
+  state.selectedTool.classList.add('selected')
 }
