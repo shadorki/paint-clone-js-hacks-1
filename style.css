@@ -66,12 +66,14 @@ body {
 }
 canvas {
   background-color: white;
+  cursor: crosshair;
 }
 .tool-bar > div[data-tool] {
-  flex-basis: 50%;
+  width: 25px;
   background-size: contain;
   padding: 5px;
-  height: 20px;
+  height: 25px;
+  margin: auto 7px;
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -104,4 +106,9 @@ canvas {
   height: 26px;
   background-color: beige;
   padding: 4px;
+}
+
+.selected {
+  border: 1px solid grey;
+  background-color: rgb(172, 172, 172);
 }
