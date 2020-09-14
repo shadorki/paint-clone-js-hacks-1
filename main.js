@@ -172,6 +172,7 @@ function saveLine(color, lineWidth, startingX, startingY, endingX, endingY) {
 function redrawLines() {
   state.drawnLines.forEach(data => {
     ctx.beginPath()
+    console.log(data.color)
     ctx.strokeStyle = data.color
     ctx.lineWidth = data.lineWidth
     ctx.moveTo(data.startingX, data.startingY)
