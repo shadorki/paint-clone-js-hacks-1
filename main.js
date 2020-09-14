@@ -6,8 +6,8 @@ const $canvas = document.querySelector('canvas')
 
 // Events
 $canvas.addEventListener('mousemove', draw)
-$canvas.addEventListener('mousemove', setMouseCoords)
-$canvas.addEventListener('mousemove', draw)
+$canvas.addEventListener('mousedown', setMouseCoords)
+$canvas.addEventListener('mouseenter', setMouseCoords)
 
 // State
 const state = {
@@ -52,7 +52,13 @@ function init() {
 
 function draw(e) {
   if(e.buttons !== 1) return;
-  console.log('drawing')
+  ctx.beginPath()
+  ctx.strokeStyle = state.selectedColor
+  ctx.lineWidth = 3
+  ctx.moveTo(state.mouseCoords.x, state.mouseCoords.y)
+  setMouseCoords(e)
+  ctx.lineTo(state.mouseCoords.x, state.mouseCoords.y)
+  ctx.stroke()
 }
 
 function setMouseCoords(e) {
