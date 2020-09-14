@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SM Paint</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="container">
+    <div class="header">
+      <span><img src="assets/images/icons/logo.png" alt="MS Paint Logo" srcset=""></span>
+      <span>untitled - Paint</span>
+    </div>
+    <div class="options">
+      <span data-option="file">File</span>
+      <span data-option="edit">Edit</span>
+      <span data-option="view">View</span>
+      <span data-option="image">Image</span>
+      <span data-option="colors">Colors</span>
+      <span data-option="help">Help</span>
+    </div>
+    <div class="interaction-container">
+      <div class="tool-bar">
+        <div data-tool="star"></div>
+        <div data-tool="square-selection"></div>
+        <div data-tool="eraser"></div>
+        <div data-tool="paint-bucket"></div>
+        <div data-tool="color-picker"></div>
+        <div data-tool="zoom"></div>
+        <div data-tool="pencil"></div>
+        <div data-tool="brush"></div>
+        <div data-tool="spray"></div>
+        <div data-tool="text"></div>
+        <div data-tool="line"></div>
+        <div data-tool="curved-line"></div>
+        <div data-tool="box"></div>
+        <div data-tool="circle"></div>
+        <div data-tool="curved-box"></div>
+      </div>
+      <div class="drawing-canvas">
+        <canvas width="710px" height="430px"></canvas>
+      </div>
+    </div>
+    <div class="color-selection">
+      <div class="current-color"></div>
+      <div class="color-palette">
+        <div data-color="black"></div>
+        <div data-color="white"></div>
+        <div data-color="grey"></div>
+        <div data-color="red"></div>
+        <div data-color="blue"></div>
+        <div data-color="green"></div>
+        <div data-color="purple"></div>
+        <div data-color="yellow"></div>
+      </div>
+    </div>
+    <div class="tool-tips">
+      Built by Uzair Ashraf for the JS Hacks 1 Hackathon
+    </div>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>

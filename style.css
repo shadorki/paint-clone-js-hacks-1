@@ -1,0 +1,107 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  height: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: rgb(50, 50, 50);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#container {
+  height: 600px;
+  width: 800px;
+  border: 2px solid blue;
+  border-radius: 4px;
+}
+
+.header {
+  background-color: rgb(3, 3, 221);
+  height: 30px;
+  padding: 3px;
+}
+.header > span:first-child > img {
+  height: 20px;
+}
+.header > span:last-child {
+  color: white;
+}
+.options {
+  background-color: beige;
+  border-bottom: 1px solid gray;
+  height: 25px;
+  display: flex;
+  align-items: center;
+}
+.options > span {
+  margin: 6px;
+  padding: 3px;
+}
+.options > span:hover {
+  cursor: pointer;
+  background-color: rgb(212, 212, 195);
+}
+.interaction-container {
+  display: flex;
+  height: 440px;
+  border-bottom: 1px solid grey;
+}
+.tool-bar {
+  background-color: beige;
+  flex-basis: 10%;
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 20px;
+}
+.drawing-canvas {
+  background-color: gray;
+  flex-basis: 90%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+canvas {
+  background-color: white;
+}
+.tool-bar > div[data-tool] {
+  flex-basis: 50%;
+  background-size: contain;
+  padding: 5px;
+  height: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+.tool-bar > div[data-tool]:hover {
+  cursor: pointer;
+  background-color: rgb(212, 212, 195);
+}
+.color-selection {
+  background-color: beige;
+  height: 75px;
+  display: flex;
+}
+.current-color {
+  flex-basis: 10%;
+  border: 4px solid beige;
+}
+.color-palette {
+  flex-basis: 60%;
+  display: flex;
+  flex-wrap: wrap;
+}
+.color-palette > div[data-color] {
+  border: 1px solid gray;
+  width: 30px;
+  height: 30px;
+  margin: 2px;
+}
+.tool-tips {
+  border-top: 2px groove grey;
+  height: 26px;
+  background-color: beige;
+  padding: 4px;
+}
