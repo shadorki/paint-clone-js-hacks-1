@@ -5,6 +5,7 @@ const $currentColor = document.querySelector('.current-color')
 const $canvas = document.querySelector('canvas')
 
 // Events
+$colorPalette.addEventListener('click', switchColor)
 $canvas.addEventListener('mousemove', draw)
 $canvas.addEventListener('mousedown', setMouseCoords)
 $canvas.addEventListener('mouseenter', setMouseCoords)
@@ -68,4 +69,11 @@ function setMouseCoords(e) {
     x: e.clientX - Math.floor(bounds.left),
     y: e.clientY - Math.floor(bounds.top)
   }
+}
+
+function switchColor(e) {
+  if(!('color' in e.target.dataset)) return;
+  const { color } = e.target.dataset
+  state.selectedColor = color
+  $currentColor.style.backgroundColor = color
 }

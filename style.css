@@ -101,6 +101,9 @@ canvas {
   height: 30px;
   margin: 2px;
 }
+div[data-color]:hover {
+  cursor: pointer;
+}
 .tool-tips {
   border-top: 2px groove grey;
   height: 26px;
