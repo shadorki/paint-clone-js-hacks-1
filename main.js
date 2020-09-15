@@ -13,7 +13,8 @@ const state = {
     startingY: null,
     endingX: null,
     endingY: null
-  }
+  },
+  globalAlpha: 1
 }
 
 
@@ -22,6 +23,7 @@ const $toolBarContainer = document.querySelector('.tool-bar')
 const $colorPalette = document.querySelector('.color-palette')
 const $currentColor = document.querySelector('.current-color')
 const $canvas = document.querySelector('canvas')
+const $opacitySlider = document.getElementById('opacity-slider')
 
 // initialization
 const ctx = $canvas.getContext('2d')
@@ -30,6 +32,7 @@ init()
 // Events
 $colorPalette.addEventListener('click', switchColor)
 $toolBarContainer.addEventListener('click', switchTool)
+$opacitySlider.addEventListener('input', setGlobalAlpha)
 
 function init() {
   // setup toolbar images
@@ -61,6 +64,7 @@ function init() {
 
 function draw(e) {
   if (e.buttons !== 1) return;
+  ctx.globalAlpha = state.globalAlpha
   ctx.beginPath()
   ctx.strokeStyle = state.selectedColor
   ctx.lineWidth = 3
@@ -70,12 +74,14 @@ function draw(e) {
   setMouseCoords(e)
   ctx.lineTo(state.mouseCoords.x, state.mouseCoords.y)
   ctx.stroke()
-  saveDrawing('line', state.selectedColor, 3, startingX, startingY, state.mouseCoords.x, state.mouseCoords.y)
+  saveDrawing('line', state.selectedColor, 3, startingX, startingY, state.globalAlpha, state.mouseCoords.x, state.mouseCoords.y)
 }
 
 function line(e) {
   if (e.buttons !== 1) return;
   clearCanvas()
+  ctx.globalAlpha = state.globalAlpha
+  ctx.beginPath()
   ctx.strokeStyle = state.selectedColor
   ctx.lineWidth = 3
   const {startingX, startingY, endingX, endingY} = state.linePoint
@@ -93,6 +99,8 @@ function line(e) {
 
 function lineMouseUp(e) {
   const bounds = e.target.getBoundingClientRect()
+  ctx.beginPath()
+  ctx.globalAlpha = state.globalAlpha
   ctx.strokeStyle = state.selectedColor
   ctx.lineWidth = 3
   state.linePoint.endingX = e.clientX - Math.floor(bounds.left)
@@ -100,7 +108,7 @@ function lineMouseUp(e) {
   ctx.moveTo(state.linePoint.startingX, state.linePoint.startingY)
   ctx.lineTo(state.linePoint.endingX, state.linePoint.endingY)
   ctx.stroke()
-  saveDrawing('line', state.selectedColor, 3, state.linePoint.startingX, state.linePoint.startingY, state.linePoint.endingX, state.linePoint.endingY)
+  saveDrawing('line', state.selectedColor, 3, state.linePoint.startingX, state.linePoint.startingY, state.globalAlpha, state.linePoint.endingX, state.linePoint.endingY)
   state.linePoint.startingX = null
   state.linePoint.startingY = null
   state.linePoint.endingX = null
@@ -110,12 +118,13 @@ function lineMouseUp(e) {
 function spray(e) {
   setMouseCoords(e)
   ctx.beginPath();
+  ctx.globalAlpha = state.globalAlpha
   ctx.arc(state.mouseCoords.x, state.mouseCoords.y, 10, 0, 2 * Math.PI);
   ctx.fillStyle = state.selectedColor
   ctx.strokeStyle = state.selectedColor
   ctx.fill()
   ctx.stroke();
-  saveDrawing('circle', state.selectedColor, 10, state.mouseCoords.x, state.mouseCoords.y)
+  saveDrawing('circle', state.selectedColor, 10, state.mouseCoords.x, state.mouseCoords.y, state.globalAlpha)
 }
 
 function erase(e) {
@@ -187,13 +196,14 @@ function removeAllCanvasEventListeners() {
   state.currentEvents = []
 }
 
-function saveDrawing(type, color, width, startingX, startingY, endingX, endingY) {
+function saveDrawing(type, color, width, startingX, startingY, globalAlpha, endingX, endingY) {
   state.drawnHistory.push({
     type,
     color,
     width,
     startingX,
     startingY,
+    globalAlpha,
     endingX,
     endingY
   })
@@ -203,6 +213,7 @@ function redrawLines() {
     switch(data.type) {
       case 'line':
         ctx.beginPath()
+        ctx.globalAlpha = data.globalAlpha || 1
         ctx.strokeStyle = data.color
         ctx.lineWidth = data.width
         ctx.moveTo(data.startingX, data.startingY)
@@ -211,6 +222,7 @@ function redrawLines() {
       break;
       case 'circle':
         ctx.beginPath();
+        ctx.globalAlpha = data.globalAlpha || 1
         ctx.arc(data.startingX, data.startingY, data.width, 0, 2 * Math.PI);
         ctx.fillStyle = data.color
         ctx.strokeStyle = data.color
@@ -223,4 +235,7 @@ function redrawLines() {
 function clearCanvas() {
   ctx.fillStyle = 'white'
   ctx.fillRect(0, 0, $canvas.width, $canvas.height);
+}
+function setGlobalAlpha(e) {
+  state.globalAlpha = Number(e.target.value)
 }
