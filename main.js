@@ -14,6 +14,12 @@ const state = {
     endingX: null,
     endingY: null
   },
+  rectanglePoint: {
+    startingX: null,
+    startingY: null,
+    width: null,
+    height: null
+  },
   globalAlpha: 1
 }
 
@@ -115,6 +121,40 @@ function lineMouseUp(e) {
   state.linePoint.endingY = null
 }
 
+function rectangle(e) {
+  if (e.buttons !== 1) return;
+  clearCanvas()
+  ctx.globalAlpha = state.globalAlpha
+  ctx.beginPath()
+  ctx.strokeStyle = state.selectedColor
+  ctx.lineWidth = 3
+  const {startingX, startingY} = state.rectanglePoint
+  if(startingX === null && startingY === null) {
+    const bounds = e.target.getBoundingClientRect()
+    state.rectanglePoint.startingX = e.clientX - Math.floor(bounds.left)
+    state.rectanglePoint.startingY = e.clientY - Math.floor(bounds.top)
+  }
+  setMouseCoords(e)
+  state.rectanglePoint.width = state.mouseCoords.x - state.rectanglePoint.startingX
+  state.rectanglePoint.height = state.mouseCoords.y - state.rectanglePoint.startingY
+  ctx.rect(state.rectanglePoint.startingX, state.rectanglePoint.startingY, state.rectanglePoint.width, state.rectanglePoint.height)
+  ctx.stroke()
+  redrawLines()
+}
+function rectangleMouseUp() {
+  ctx.beginPath()
+  ctx.globalAlpha = state.globalAlpha
+  ctx.strokeStyle = state.selectedColor
+  ctx.lineWidth = 3
+  ctx.rect(state.rectanglePoint.startingX, state.rectanglePoint.startingY, state.rectanglePoint.width, state.rectanglePoint.height)
+  saveDrawing('rectangle', state.selectedColor, 3, state.rectanglePoint.startingX, state.rectanglePoint.startingY, state.globalAlpha, state.rectanglePoint.width, state.rectanglePoint.height)
+  ctx.stroke()
+  state.rectanglePoint.startingX = null
+  state.rectanglePoint.startingY = null
+  state.rectanglePoint.width = null
+  state.rectanglePoint.height = null
+}
+
 function spray(e) {
   setMouseCoords(e)
   ctx.beginPath();
@@ -180,6 +220,10 @@ function setCanvasListenersBasedOffTool(tool) {
     break;
     case 'eraser':
       addCanvasEventListener('mousemove', erase)
+    break;
+    case 'box':
+      addCanvasEventListener('mousemove', rectangle)
+      addCanvasEventListener('mouseup', rectangleMouseUp)
   }
 }
 
@@ -196,11 +240,11 @@ function removeAllCanvasEventListeners() {
   state.currentEvents = []
 }
 
-function saveDrawing(type, color, width, startingX, startingY, globalAlpha, endingX, endingY) {
+function saveDrawing(type, color, lineWidth, startingX, startingY, globalAlpha, endingX, endingY) {
   state.drawnHistory.push({
     type,
     color,
-    width,
+    lineWidth,
     startingX,
     startingY,
     globalAlpha,
@@ -215,7 +259,7 @@ function redrawLines() {
         ctx.beginPath()
         ctx.globalAlpha = data.globalAlpha || 1
         ctx.strokeStyle = data.color
-        ctx.lineWidth = data.width
+        ctx.lineWidth = data.lineWidth
         ctx.moveTo(data.startingX, data.startingY)
         ctx.lineTo(data.endingX, data.endingY)
         ctx.stroke()
@@ -223,12 +267,19 @@ function redrawLines() {
       case 'circle':
         ctx.beginPath();
         ctx.globalAlpha = data.globalAlpha || 1
-        ctx.arc(data.startingX, data.startingY, data.width, 0, 2 * Math.PI);
+        ctx.arc(data.startingX, data.startingY, data.lineWidth, 0, 2 * Math.PI);
         ctx.fillStyle = data.color
         ctx.strokeStyle = data.color
         ctx.fill()
         ctx.stroke();
       break;
+      case 'rectangle':
+        ctx.beginPath()
+        ctx.globalAlpha = data.globalAlpha
+        ctx.strokeStyle = data.color
+        ctx.lineWidth = data.lineWidth
+        ctx.rect(data.startingX, data.startingY, data.endingX, data.endingY)
+        ctx.stroke()
     }
   })
 }
