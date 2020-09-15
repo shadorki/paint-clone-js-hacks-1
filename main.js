@@ -178,6 +178,19 @@ function circle(e) {
   redrawLines()
 }
 
+function circleMouseUp(e) {
+  ctx.beginPath()
+  ctx.globalAlpha = state.globalAlpha
+  ctx.strokeStyle = state.selectedColor
+  ctx.lineWidth = 3
+  ctx.arc(state.circlePoint.startingX, state.circlePoint.startingY, state.circlePoint.radius, 0, 2 * Math.PI);
+  saveDrawing('circle', state.selectedColor, 3, state.circlePoint.startingX, state.circlePoint.startingY, state.globalAlpha, state.circlePoint.radius)
+  ctx.stroke()
+  state.circlePoint.startingX = null
+  state.circlePoint.startingY = null
+  state.circlePoint.radius = null
+}
+
 function spray(e) {
   setMouseCoords(e)
   ctx.beginPath();
@@ -187,7 +200,7 @@ function spray(e) {
   ctx.strokeStyle = state.selectedColor
   ctx.fill()
   ctx.stroke();
-  saveDrawing('circle', state.selectedColor, 10, state.mouseCoords.x, state.mouseCoords.y, state.globalAlpha)
+  saveDrawing('solid-circle', state.selectedColor, 10, state.mouseCoords.x, state.mouseCoords.y, state.globalAlpha)
 }
 
 function erase(e) {
@@ -199,7 +212,7 @@ function erase(e) {
   ctx.strokeStyle = 'white'
   ctx.fill()
   ctx.stroke();
-  saveDrawing('circle', 'white', 10, state.mouseCoords.x, state.mouseCoords.y)
+  saveDrawing('solid-circle', 'white', 10, state.mouseCoords.x, state.mouseCoords.y)
 }
 
 function setMouseCoords(e) {
@@ -250,6 +263,7 @@ function setCanvasListenersBasedOffTool(tool) {
     break;
     case 'circle':
       addCanvasEventListener('mousemove', circle)
+      addCanvasEventListener('mouseup', circleMouseUp)
     break;
   }
 }
@@ -279,6 +293,7 @@ function saveDrawing(type, color, lineWidth, startingX, startingY, globalAlpha, 
     endingY
   })
 }
+  // This logic uses property names inappropriately, it bugs the crap out of me, but its a hackathon ¯\_(ツ)_/¯
 function redrawLines() {
   state.drawnHistory.forEach(data => {
     switch(data.type) {
@@ -291,7 +306,8 @@ function redrawLines() {
         ctx.lineTo(data.endingX, data.endingY)
         ctx.stroke()
       break;
-      case 'circle':
+      // This is so bad
+      case 'solid-circle':
         ctx.beginPath();
         ctx.globalAlpha = data.globalAlpha || 1
         ctx.arc(data.startingX, data.startingY, data.lineWidth, 0, 2 * Math.PI);
@@ -299,6 +315,14 @@ function redrawLines() {
         ctx.strokeStyle = data.color
         ctx.fill()
         ctx.stroke();
+      break;
+      case 'circle':
+        ctx.beginPath()
+        ctx.globalAlpha = data.globalAlpha
+        ctx.arc(data.startingX, data.startingY, data.endingX, 0, 2 * Math.PI)
+        ctx.strokeStyle = data.color
+        ctx.lineWidth = data.lineWidth
+        ctx.stroke()
       break;
       case 'rectangle':
         ctx.beginPath()
