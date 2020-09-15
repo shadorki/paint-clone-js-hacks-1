@@ -118,6 +118,18 @@ function spray(e) {
   saveDrawing('circle', state.selectedColor, 10, state.mouseCoords.x, state.mouseCoords.y)
 }
 
+function erase(e) {
+  if(e.buttons !== 1) return;
+  setMouseCoords(e)
+  ctx.beginPath();
+  ctx.arc(state.mouseCoords.x, state.mouseCoords.y, 10, 0, 2 * Math.PI);
+  ctx.fillStyle = 'white'
+  ctx.strokeStyle = 'white'
+  ctx.fill()
+  ctx.stroke();
+  saveDrawing('circle', 'white', 10, state.mouseCoords.x, state.mouseCoords.y)
+}
+
 function setMouseCoords(e) {
   const bounds = e.target.getBoundingClientRect()
   // Theres probably a better way to do this, will refactor later
@@ -156,6 +168,9 @@ function setCanvasListenersBasedOffTool(tool) {
     break;
     case 'spray':
       addCanvasEventListener('click', spray)
+    break;
+    case 'eraser':
+      addCanvasEventListener('mousemove', erase)
   }
 }
 
