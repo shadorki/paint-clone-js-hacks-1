@@ -2,7 +2,7 @@
 const state = {
   selectedColor: null,
   selectedTool: null,
-  drawnLines: [],
+  drawnHistory: [],
   currentEvents: [],
   mouseCoords: {
     x: 0,
@@ -59,7 +59,7 @@ function init() {
   setCanvasListenersBasedOffTool(state.selectedTool.dataset.tool)
 }
 
-function pencil(e) {
+function draw(e) {
   if (e.buttons !== 1) return;
   ctx.beginPath()
   ctx.strokeStyle = state.selectedColor
@@ -70,7 +70,7 @@ function pencil(e) {
   setMouseCoords(e)
   ctx.lineTo(state.mouseCoords.x, state.mouseCoords.y)
   ctx.stroke()
-  saveLine(state.selectedColor, 3, startingX, startingY, state.mouseCoords.x, state.mouseCoords.y)
+  saveDrawing('line', state.selectedColor, 3, startingX, startingY, state.mouseCoords.x, state.mouseCoords.y)
 }
 
 function line(e) {
@@ -100,11 +100,22 @@ function lineMouseUp(e) {
   ctx.moveTo(state.linePoint.startingX, state.linePoint.startingY)
   ctx.lineTo(state.linePoint.endingX, state.linePoint.endingY)
   ctx.stroke()
-  saveLine(state.selectedColor, 3, state.linePoint.startingX, state.linePoint.startingY, state.linePoint.endingX, state.linePoint.endingY)
+  saveDrawing('line', state.selectedColor, 3, state.linePoint.startingX, state.linePoint.startingY, state.linePoint.endingX, state.linePoint.endingY)
   state.linePoint.startingX = null
   state.linePoint.startingY = null
   state.linePoint.endingX = null
   state.linePoint.endingY = null
+}
+
+function spray(e) {
+  setMouseCoords(e)
+  ctx.beginPath();
+  ctx.arc(state.mouseCoords.x, state.mouseCoords.y, 10, 0, 2 * Math.PI);
+  ctx.fillStyle = state.selectedColor
+  ctx.strokeStyle = state.selectedColor
+  ctx.fill()
+  ctx.stroke();
+  saveDrawing('circle', state.selectedColor, 10, state.mouseCoords.x, state.mouseCoords.y)
 }
 
 function setMouseCoords(e) {
@@ -135,7 +146,7 @@ function switchTool(e) {
 function setCanvasListenersBasedOffTool(tool) {
   switch(tool) {
     case 'pencil':
-      addCanvasEventListener('mousemove', pencil)
+      addCanvasEventListener('mousemove', draw)
       addCanvasEventListener('mousedown', setMouseCoords)
       addCanvasEventListener('mouseenter', setMouseCoords)
     break;
@@ -143,6 +154,8 @@ function setCanvasListenersBasedOffTool(tool) {
       addCanvasEventListener('mousemove', line)
       addCanvasEventListener('mouseup', lineMouseUp)
     break;
+    case 'spray':
+      addCanvasEventListener('click', spray)
   }
 }
 
@@ -159,10 +172,11 @@ function removeAllCanvasEventListeners() {
   state.currentEvents = []
 }
 
-function saveLine(color, lineWidth, startingX, startingY, endingX, endingY) {
-  state.drawnLines.push({
+function saveDrawing(type, color, width, startingX, startingY, endingX, endingY) {
+  state.drawnHistory.push({
+    type,
     color,
-    lineWidth,
+    width,
     startingX,
     startingY,
     endingX,
@@ -170,14 +184,25 @@ function saveLine(color, lineWidth, startingX, startingY, endingX, endingY) {
   })
 }
 function redrawLines() {
-  state.drawnLines.forEach(data => {
-    ctx.beginPath()
-    console.log(data.color)
-    ctx.strokeStyle = data.color
-    ctx.lineWidth = data.lineWidth
-    ctx.moveTo(data.startingX, data.startingY)
-    ctx.lineTo(data.endingX, data.endingY)
-    ctx.stroke()
+  state.drawnHistory.forEach(data => {
+    switch(data.type) {
+      case 'line':
+        ctx.beginPath()
+        ctx.strokeStyle = data.color
+        ctx.lineWidth = data.width
+        ctx.moveTo(data.startingX, data.startingY)
+        ctx.lineTo(data.endingX, data.endingY)
+        ctx.stroke()
+      break;
+      case 'circle':
+        ctx.beginPath();
+        ctx.arc(data.startingX, data.startingY, data.width, 0, 2 * Math.PI);
+        ctx.fillStyle = data.color
+        ctx.strokeStyle = data.color
+        ctx.fill()
+        ctx.stroke();
+      break;
+    }
   })
 }
 function clearCanvas() {
