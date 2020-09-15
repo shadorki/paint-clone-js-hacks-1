@@ -20,6 +20,11 @@ const state = {
     width: null,
     height: null
   },
+  circlePoint: {
+    startingX: null,
+    startingY: null,
+    radius: null
+  },
   globalAlpha: 1
 }
 
@@ -154,6 +159,24 @@ function rectangleMouseUp() {
   state.rectanglePoint.width = null
   state.rectanglePoint.height = null
 }
+function circle(e) {
+  if(e.buttons !== 1) return;
+  clearCanvas()
+  setMouseCoords(e)
+  ctx.beginPath();
+  ctx.globalAlpha = state.globalAlpha
+  ctx.strokeStyle = state.selectedColor
+  ctx.lineWidth = 3
+  const {startingX, startingY} = state.circlePoint
+  if(startingX === null && startingY === null) {
+    state.circlePoint.startingX = state.mouseCoords.x
+    state.circlePoint.startingY = state.mouseCoords.y
+  }
+  state.circlePoint.radius = Math.abs((state.circlePoint.startingX + state.circlePoint.startingY) - (state.mouseCoords.x + state.mouseCoords.y))
+  ctx.arc(state.circlePoint.startingX, state.circlePoint.startingY, state.circlePoint.radius, 0, 2 * Math.PI);
+  ctx.stroke()
+  redrawLines()
+}
 
 function spray(e) {
   setMouseCoords(e)
@@ -224,6 +247,10 @@ function setCanvasListenersBasedOffTool(tool) {
     case 'box':
       addCanvasEventListener('mousemove', rectangle)
       addCanvasEventListener('mouseup', rectangleMouseUp)
+    break;
+    case 'circle':
+      addCanvasEventListener('mousemove', circle)
+    break;
   }
 }
 
