@@ -33,6 +33,7 @@ const state = {
 const $toolBarContainer = document.querySelector('.tool-bar')
 const $colorPalette = document.querySelector('.color-palette')
 const $currentColor = document.querySelector('.current-color')
+const $optionsContainer = document.querySelector('.options')
 const $canvas = document.querySelector('#realCanvas')
 const $fakeCanvas = document.querySelector('#fakeCanvas')
 const $opacitySlider = document.getElementById('opacity-slider')
@@ -43,6 +44,7 @@ const fakeCtx = $fakeCanvas.getContext('2d')
 init()
 
 // Events
+$optionsContainer.addEventListener('click', handleOption)
 $colorPalette.addEventListener('click', switchColor)
 $toolBarContainer.addEventListener('click', switchTool)
 $opacitySlider.addEventListener('input', setGlobalAlpha)
@@ -73,6 +75,22 @@ function init() {
   }
   state.selectedTool.classList.add('selected')
   setCanvasListenersBasedOffTool(state.selectedTool.dataset.tool)
+}
+
+function handleOption(e) {
+  if(!('option' in e.target.dataset)) return;
+  const { option } = e.target.dataset
+  const optionsHandler = {
+    reset,
+    export: null,
+    save: null
+  }
+  optionsHandler[option]()
+}
+
+function reset() {
+  state.drawnHistory = []
+  clearCanvas()
 }
 
 function draw(e) {
@@ -362,6 +380,9 @@ function redrawLines() {
         ctx.stroke()
     }
   })
+}
+function clearCanvas() {
+  ctx.clearRect(0, 0, $canvas.width, $canvas.height);
 }
 function clearFakeCanvas() {
   fakeCtx.clearRect(0, 0, $fakeCanvas.width, $fakeCanvas.height);
