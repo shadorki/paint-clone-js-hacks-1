@@ -63,6 +63,8 @@ function init() {
     const { color } = colorElement.dataset
     colorElement.style.backgroundColor = color
   }
+  // load save if can
+  loadSavedState()
   // setup initial selected color
   if(state.selectedColor === null) {
     state.selectedColor = 'black'
@@ -71,11 +73,10 @@ function init() {
   // setup initial selected tool
   if(state.selectedTool === null) {
     state.selectedTool = document.querySelector('div[data-tool=pencil]')
-  } else {
-    state.selectedTool = document.querySelector(`div[data-tool=${state.selectedTool}]`)
   }
   state.selectedTool.classList.add('selected')
   setCanvasListenersBasedOffTool(state.selectedTool.dataset.tool)
+  redrawLines()
 }
 
 function handleOption(e) {
@@ -84,7 +85,7 @@ function handleOption(e) {
   const optionsHandler = {
     reset,
     export: null,
-    save: null
+    save
   }
   optionsHandler[option]()
 }
@@ -92,6 +93,24 @@ function handleOption(e) {
 function reset() {
   state.drawnHistory = []
   clearCanvas()
+}
+function loadSavedState() {
+  if(!localStorage.hasOwnProperty('state')) return;
+  const saveStore = JSON.parse(localStorage.getItem('state'))
+  state.drawnHistory = saveStore.drawnHistory
+  state.selectedColor = saveStore.selectedColor
+  state.selectedTool = document.querySelector(`div[data-tool=${saveStore.selectedTool}]`)
+  state.globalAlpha = saveStore.globalAlpha
+  $opacitySlider.value = saveStore.globalAlpha
+}
+function save() {
+  const saveStore = {
+    drawnHistory: state.drawnHistory,
+    selectedColor: state.selectedColor,
+    selectedTool: state.selectedTool.dataset.tool,
+    globalAlpha: state.globalAlpha
+  }
+  localStorage.setItem('state', JSON.stringify(saveStore))
 }
 
 function draw(e) {
