@@ -89,6 +89,18 @@ function draw(e) {
   ctx.stroke()
   saveDrawing('line', state.selectedColor, 3, startingX, startingY, state.globalAlpha, state.mouseCoords.x, state.mouseCoords.y)
 }
+function brush(e) {
+  if(e.buttons !== 1) return;
+  setMouseCoords(e)
+  ctx.beginPath();
+  ctx.globalAlpha = state.globalAlpha
+  ctx.arc(state.mouseCoords.x, state.mouseCoords.y, 10, 0, 2 * Math.PI);
+  ctx.fillStyle = state.selectedColor
+  ctx.strokeStyle = state.selectedColor
+  ctx.fill()
+  ctx.stroke();
+  saveDrawing('solid-circle', state.selectedColor, 10, state.mouseCoords.x, state.mouseCoords.y, state.globalAlpha)
+}
 
 function line(e) {
   if (e.buttons !== 1) return;
@@ -272,6 +284,10 @@ function setCanvasListenersBasedOffTool(tool) {
       triggerFakeCanvas()
       addCanvasEventListener('mousemove', circle, true)
       addCanvasEventListener('mouseup', circleMouseUp, true)
+    break;
+    case 'brush':
+      hideFakeCanvas()
+      addCanvasEventListener('mousemove', brush, false)
     break;
   }
 }
