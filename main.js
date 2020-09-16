@@ -4,6 +4,7 @@ const state = {
   selectedTool: null,
   drawnHistory: [],
   currentEvents: [],
+  isZoomed: false,
   mouseCoords: {
     x: 0,
     y: 0
@@ -118,6 +119,19 @@ function brush(e) {
   ctx.fill()
   ctx.stroke();
   saveDrawing('solid-circle', state.selectedColor, 10, state.mouseCoords.x, state.mouseCoords.y, state.globalAlpha)
+}
+function zoom(e) {
+  setMouseCoords(e)
+  if(!state.isZoomed) {
+    $canvas.style.transform = 'scale(2.0)'
+  } else {
+    $canvas.style.transform = ''
+  }
+  state.isZoomed = !state.isZoomed
+}
+function resetZoom() {
+  state.isZoomed = false
+  $canvas.style.transform = ''
 }
 
 function line(e) {
@@ -266,6 +280,7 @@ function switchColor(e) {
 function switchTool(e) {
   if (!('tool' in e.target.dataset)) return;
   removeAllCanvasEventListeners()
+  resetZoom() // needed for now because zoom throws off calculations
   state.selectedTool.classList.remove('selected')
   state.selectedTool = e.target
   state.selectedTool.classList.add('selected')
@@ -307,6 +322,10 @@ function setCanvasListenersBasedOffTool(tool) {
       hideFakeCanvas()
       addCanvasEventListener('mousemove', brush, false)
     break;
+    case 'zoom':
+      hideFakeCanvas()
+      addCanvasEventListener('click', zoom, false)
+      break;
   }
 }
 
@@ -391,7 +410,7 @@ function setGlobalAlpha(e) {
   state.globalAlpha = Number(e.target.value)
 }
 function triggerFakeCanvas() {
-    $fakeCanvas.className = ''
+  $fakeCanvas.className = ''
 }
 function hideFakeCanvas() {
   $fakeCanvas.className = 'hidden'

@@ -18,7 +18,7 @@ a {
 }
 #container {
   height: 600px;
-  width: 800px;
+  width: 815px;
   border: 2px solid blue;
   border-radius: 4px;
 }
@@ -68,6 +68,7 @@ a {
   justify-content: center;
   align-items: center;
   position: relative;
+  overflow: auto;
 }
 canvas {
   cursor: crosshair;
