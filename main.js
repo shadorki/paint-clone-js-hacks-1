@@ -33,11 +33,13 @@ const state = {
 const $toolBarContainer = document.querySelector('.tool-bar')
 const $colorPalette = document.querySelector('.color-palette')
 const $currentColor = document.querySelector('.current-color')
-const $canvas = document.querySelector('canvas')
+const $canvas = document.querySelector('#realCanvas')
+const $fakeCanvas = document.querySelector('#fakeCanvas')
 const $opacitySlider = document.getElementById('opacity-slider')
 
 // initialization
 const ctx = $canvas.getContext('2d')
+const fakeCtx = $fakeCanvas.getContext('2d')
 init()
 
 // Events
@@ -90,25 +92,25 @@ function draw(e) {
 
 function line(e) {
   if (e.buttons !== 1) return;
-  clearCanvas()
-  ctx.globalAlpha = state.globalAlpha
-  ctx.beginPath()
-  ctx.strokeStyle = state.selectedColor
-  ctx.lineWidth = 3
+  clearFakeCanvas()
+  fakeCtx.globalAlpha = state.globalAlpha
+  fakeCtx.beginPath()
+  fakeCtx.strokeStyle = state.selectedColor
+  fakeCtx.lineWidth = 3
   const {startingX, startingY, endingX, endingY} = state.linePoint
   if(startingX === null && startingY === null) {
     const bounds = e.target.getBoundingClientRect()
     state.linePoint.startingX = e.clientX - Math.floor(bounds.left)
     state.linePoint.startingY = e.clientY - Math.floor(bounds.top)
   }
-  ctx.moveTo(state.linePoint.startingX, state.linePoint.startingY)
+  fakeCtx.moveTo(state.linePoint.startingX, state.linePoint.startingY)
   setMouseCoords(e)
-  ctx.lineTo(state.mouseCoords.x, state.mouseCoords.y)
-  ctx.stroke()
-  redrawLines()
+  fakeCtx.lineTo(state.mouseCoords.x, state.mouseCoords.y)
+  fakeCtx.stroke()
 }
 
 function lineMouseUp(e) {
+  clearFakeCanvas()
   const bounds = e.target.getBoundingClientRect()
   ctx.beginPath()
   ctx.globalAlpha = state.globalAlpha
@@ -128,11 +130,11 @@ function lineMouseUp(e) {
 
 function rectangle(e) {
   if (e.buttons !== 1) return;
-  clearCanvas()
-  ctx.globalAlpha = state.globalAlpha
-  ctx.beginPath()
-  ctx.strokeStyle = state.selectedColor
-  ctx.lineWidth = 3
+  clearFakeCanvas()
+  fakeCtx.globalAlpha = state.globalAlpha
+  fakeCtx.beginPath()
+  fakeCtx.strokeStyle = state.selectedColor
+  fakeCtx.lineWidth = 3
   const {startingX, startingY} = state.rectanglePoint
   if(startingX === null && startingY === null) {
     const bounds = e.target.getBoundingClientRect()
@@ -142,11 +144,11 @@ function rectangle(e) {
   setMouseCoords(e)
   state.rectanglePoint.width = state.mouseCoords.x - state.rectanglePoint.startingX
   state.rectanglePoint.height = state.mouseCoords.y - state.rectanglePoint.startingY
-  ctx.rect(state.rectanglePoint.startingX, state.rectanglePoint.startingY, state.rectanglePoint.width, state.rectanglePoint.height)
-  ctx.stroke()
-  redrawLines()
+  fakeCtx.rect(state.rectanglePoint.startingX, state.rectanglePoint.startingY, state.rectanglePoint.width, state.rectanglePoint.height)
+  fakeCtx.stroke()
 }
 function rectangleMouseUp() {
+  clearFakeCanvas()
   ctx.beginPath()
   ctx.globalAlpha = state.globalAlpha
   ctx.strokeStyle = state.selectedColor
@@ -161,24 +163,24 @@ function rectangleMouseUp() {
 }
 function circle(e) {
   if(e.buttons !== 1) return;
-  clearCanvas()
+  clearFakeCanvas()
   setMouseCoords(e)
-  ctx.beginPath();
-  ctx.globalAlpha = state.globalAlpha
-  ctx.strokeStyle = state.selectedColor
-  ctx.lineWidth = 3
+  fakeCtx.beginPath();
+  fakeCtx.globalAlpha = state.globalAlpha
+  fakeCtx.strokeStyle = state.selectedColor
+  fakeCtx.lineWidth = 3
   const {startingX, startingY} = state.circlePoint
   if(startingX === null && startingY === null) {
     state.circlePoint.startingX = state.mouseCoords.x
     state.circlePoint.startingY = state.mouseCoords.y
   }
   state.circlePoint.radius = Math.abs((state.circlePoint.startingX + state.circlePoint.startingY) - (state.mouseCoords.x + state.mouseCoords.y))
-  ctx.arc(state.circlePoint.startingX, state.circlePoint.startingY, state.circlePoint.radius, 0, 2 * Math.PI);
-  ctx.stroke()
-  redrawLines()
+  fakeCtx.arc(state.circlePoint.startingX, state.circlePoint.startingY, state.circlePoint.radius, 0, 2 * Math.PI);
+  fakeCtx.stroke()
 }
 
 function circleMouseUp(e) {
+  clearFakeCanvas()
   ctx.beginPath()
   ctx.globalAlpha = state.globalAlpha
   ctx.strokeStyle = state.selectedColor
@@ -243,41 +245,52 @@ function switchTool(e) {
 function setCanvasListenersBasedOffTool(tool) {
   switch(tool) {
     case 'pencil':
-      addCanvasEventListener('mousemove', draw)
-      addCanvasEventListener('mousedown', setMouseCoords)
-      addCanvasEventListener('mouseenter', setMouseCoords)
+      hideFakeCanvas()
+      addCanvasEventListener('mousemove', draw, false)
+      addCanvasEventListener('mousedown', setMouseCoords, false)
+      addCanvasEventListener('mouseenter', setMouseCoords, false)
     break;
     case 'line':
-      addCanvasEventListener('mousemove', line)
-      addCanvasEventListener('mouseup', lineMouseUp)
+      triggerFakeCanvas()
+      addCanvasEventListener('mousemove', line, true)
+      addCanvasEventListener('mouseup', lineMouseUp, true)
     break;
     case 'spray':
-      addCanvasEventListener('click', spray)
+      hideFakeCanvas()
+      addCanvasEventListener('click', spray, false)
     break;
     case 'eraser':
-      addCanvasEventListener('mousemove', erase)
+      hideFakeCanvas()
+      addCanvasEventListener('mousemove', erase, false)
     break;
     case 'box':
-      addCanvasEventListener('mousemove', rectangle)
-      addCanvasEventListener('mouseup', rectangleMouseUp)
+      triggerFakeCanvas()
+      addCanvasEventListener('mousemove', rectangle, true)
+      addCanvasEventListener('mouseup', rectangleMouseUp, true)
     break;
     case 'circle':
-      addCanvasEventListener('mousemove', circle)
-      addCanvasEventListener('mouseup', circleMouseUp)
+      triggerFakeCanvas()
+      addCanvasEventListener('mousemove', circle, true)
+      addCanvasEventListener('mouseup', circleMouseUp, true)
     break;
   }
 }
 
-function addCanvasEventListener(type, cb) {
+function addCanvasEventListener(type, cb, isFake = false) {
   state.currentEvents.push({
     type,
-    cb
+    cb,
+    isFake
   })
-  $canvas.addEventListener(type, cb)
+  if(isFake) {
+    $fakeCanvas.addEventListener(type, cb)
+  } else {
+    $canvas.addEventListener(type, cb)
+  }
 }
 
 function removeAllCanvasEventListeners() {
-  state.currentEvents.forEach(e => $canvas.removeEventListener(e.type, e.cb))
+  state.currentEvents.forEach(e => e.isFake ? $fakeCanvas.removeEventListener(e.type, e.cb) : $canvas.removeEventListener(e.type, e.cb))
   state.currentEvents = []
 }
 
@@ -334,10 +347,15 @@ function redrawLines() {
     }
   })
 }
-function clearCanvas() {
-  ctx.fillStyle = 'white'
-  ctx.fillRect(0, 0, $canvas.width, $canvas.height);
+function clearFakeCanvas() {
+  fakeCtx.clearRect(0, 0, $fakeCanvas.width, $fakeCanvas.height);
 }
 function setGlobalAlpha(e) {
   state.globalAlpha = Number(e.target.value)
+}
+function triggerFakeCanvas() {
+    $fakeCanvas.className = ''
+}
+function hideFakeCanvas() {
+  $fakeCanvas.className = 'hidden'
 }

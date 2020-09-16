@@ -63,10 +63,16 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 }
 canvas {
-  background-color: white;
   cursor: crosshair;
+}
+#realCanvas {
+  background-color: white;
+}
+#fakeCanvas {
+  position: absolute;
 }
 .tool-bar > div[data-tool] {
   width: 25px;
@@ -115,4 +121,8 @@ div[data-color]:hover {
   border: 1px solid grey;
   border-radius: 4px;
   background-color: rgb(172, 172, 172);
+}
+
+.hidden {
+  display: none;
 }

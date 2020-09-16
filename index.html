@@ -24,20 +24,17 @@
     <div class="interaction-container">
       <div class="tool-bar">
         <div data-tool="eraser"></div>
-        <div data-tool="paint-bucket"></div>
-        <div data-tool="color-picker"></div>
         <div data-tool="zoom"></div>
         <div data-tool="pencil"></div>
         <div data-tool="brush"></div>
         <div data-tool="spray"></div>
         <div data-tool="line"></div>
-        <div data-tool="curved-line"></div>
         <div data-tool="box"></div>
         <div data-tool="circle"></div>
-        <div data-tool="curved-box"></div>
       </div>
       <div class="drawing-canvas">
-        <canvas width="710px" height="430px"></canvas>
+        <canvas id="realCanvas" width="710px" height="430px"></canvas>
+        <canvas class="hidden" id="fakeCanvas" width="710px" height="430px"></canvas>
       </div>
     </div>
     <div class="color-selection">
