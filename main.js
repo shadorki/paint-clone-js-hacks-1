@@ -84,7 +84,7 @@ function handleOption(e) {
   const { option } = e.target.dataset
   const optionsHandler = {
     reset,
-    export: null,
+    exportImage,
     save
   }
   optionsHandler[option]()
@@ -111,6 +111,12 @@ function save() {
     globalAlpha: state.globalAlpha
   }
   localStorage.setItem('state', JSON.stringify(saveStore))
+}
+function exportImage() {
+  const a = document.createElement('a')
+  a.download = 'ms-paint-clone-image.png'
+  a.href = $canvas.toDataURL('image/png').replace("image/png", "image/octet-stream")
+  a.click()
 }
 
 function draw(e) {
